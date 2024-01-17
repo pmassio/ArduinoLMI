@@ -50,7 +50,7 @@ This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$,
 Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param(Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float pmax, float pmin);
 ```
 Returns a pointer to a two-dimensional array of MatriXf pointers object containing a matrix $K$ of gains, such that the matrix 
-$A_0+p_1 A_1+ B(\texttt{ *K[0]}+p_1 *\texttt{ *K[1]})$
+$A_0+p_1 A_1+ B(\texttt{*K[0]}+p_1\texttt{*K[1]})$
 is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
 <br> $-\texttt{amax} \geqslant \Re(\lambda) \geqslant -\texttt{amin}$, 
 <br> $|\Im(\lambda)|\geqslant \texttt{beta} |\Re(\lambda)|$,
