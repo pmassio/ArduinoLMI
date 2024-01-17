@@ -56,5 +56,13 @@ is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constr
 <br> $|\Im(\lambda)|\leqslant \texttt{beta} |\Re(\lambda)|$,
 <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
-This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate.
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate. Remember to delete  \texttt{Kp[0]}
+  and \texttt{Kp[1]} to free the memory before launching this function for a second time.
+
+# Licence 
+GNU General Public License 3.0
+
+
+# Autor
+[Paolo Massioni](https://sites.google.com/site/pmassio/home)
 
