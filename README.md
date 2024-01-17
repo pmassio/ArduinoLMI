@@ -15,15 +15,32 @@ For the regional pole placement method, refer to  [Stephen Boyd, Laurent El Ghao
 ## Usage
 The library provides an embedded implementation of controller synthesis problems requiring the solution of a Linear Matrix Inequality (LMI) feasibility problem. In general this can be made on a laptop computer, and the resulting gain can be just copied on the embedded controller; this library is aimed at applications where the controller needs to be recomputed on board, such as adaptive control, autonomous systems, etc. Please take into account that the solver will take a significant time to deliver a solution, in the order of a few seconds or few tens of seconds for systems up to order four. Do not use this code for high-order system.
 
+The functions return $0$ matrices if the problem is unfeasible.
+
 Please see the example.ino for an example of application code.
 
-### User Functions
+## User functions
+### Nominal regional pole placement
 ```cpp
 Eigen::MatrixXf RegionalPolePlacement(Eigen::MatrixXf A, Eigen::MatrixXf B, float amax, float amin, float beta)  
 ```
-Returns a MatriXf object containing a matrix K of gains, such that the matrix 
+Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A+BK$
-is Hurwitz and has the eigenvalues $\lambda$ fulfilling the following constraints
+is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
 <br> -\texttt{amax} \geqslant \Re(\lambda) \geqslant -\texttt{amin}, 
-<br> |\Im(lambda)|\geqslant \texttt{beta} |\Re(lambda)|
+<br> |\Im(\lambda)|\geqslant \texttt{beta} |\Re(\lambda)|.
 <br>
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate.
+
+### Robust regional pole placement (with 1 parameter)
+```cpp
+Eigen::MatrixXf RegionalPolePlacementRobust1Param(Eigen::MatrixXf A0, Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float p1max, float p1min);    
+```
+Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
+$A_0+p_1 A_1 BK$
+is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
+<br> -\texttt{amax} \geqslant \Re(\lambda) \geqslant -\texttt{amin}, 
+<br> |\Im(\lambda)|\geqslant \texttt{beta} |\Re(\lambda)|,
+<br>
+for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate.
