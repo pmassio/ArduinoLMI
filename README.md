@@ -28,7 +28,7 @@ Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix
 $A+BK$
 is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
 <br> $-\texttt{amax} \geqslant \Re(\lambda) \geqslant -\texttt{amin}$, 
-<br> $|\Im(\lambda)|\geqslant \texttt{beta} |\Re(\lambda)|$.
+<br> $|\Im(\lambda)|\leqslant \texttt{beta} |\Re(\lambda)|$.
 <br>
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate.
 
@@ -40,7 +40,7 @@ Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix
 $A_0+p_1 A_1+ BK$
 is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
 <br> $-\texttt{amax} \geqslant \Re(\lambda) \geqslant -\texttt{amin}$, 
-<br> $|\Im(\lambda)|\geqslant \texttt{beta} |\Re(\lambda)|$,
+<br> $|\Im(\lambda)|\leqslant \texttt{beta} |\Re(\lambda)|$,
 <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate.
@@ -53,7 +53,7 @@ Returns a pointer to a two-dimensional array of MatriXf pointers object containi
 $A_0+p_1 A_1+ B(\texttt{*K[0]}+p_1\texttt{*K[1]})$
 is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
 <br> $-\texttt{amax} \geqslant \Re(\lambda) \geqslant -\texttt{amin}$, 
-<br> $|\Im(\lambda)|\geqslant \texttt{beta} |\Re(\lambda)|$,
+<br> $|\Im(\lambda)|\leqslant \texttt{beta} |\Re(\lambda)|$,
 <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate.
