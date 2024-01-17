@@ -21,3 +21,8 @@ Please see the example.ino for an example of application code.
 ```cpp
 Eigen::MatrixXf RegionalPolePlacement(Eigen::MatrixXf A, Eigen::MatrixXf B, float amax, float amin, float beta)  
 ```
+Returns a MatriXf object containing a matrix K of gains, such that the matrix 
+$
+A+BK
+$
+is Hurwitz and has the eigenvalues $\lambda$ fulfilling the following constraints
