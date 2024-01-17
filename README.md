@@ -12,6 +12,9 @@ For the regional pole placement method, refer to  [Stephen Boyd, Laurent El Ghao
  Volume 15 of Studies in Applied Mathematics, Society for Industrial and Applied 
  Mathematics (SIAM), 1994*](https://web.stanford.edu/~boyd/lmibook/lmibook.pdf).
 
+## Requirements
+Requires [ArduinoEigen](https://github.com/hideakitai/ArduinoEigen).
+
 ## Usage
 The library provides an embedded implementation of controller synthesis problems requiring the solution of a Linear Matrix Inequality (LMI) feasibility problem. In general this can be made on a laptop computer, and the resulting gain can be just copied on the embedded controller; this library is aimed at applications where the controller needs to be recomputed on board, such as adaptive control, autonomous systems, etc. Please take into account that the solver will take a significant time to deliver a solution, in the order of a few seconds or few tens of seconds for systems up to order four. Do not use this code for high-order system.
 
