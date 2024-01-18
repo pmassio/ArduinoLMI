@@ -43,7 +43,7 @@
 // supported by all Arduino boards. This code has been tested to work on Arduino 
 // MKR1000 and Arduino MKR1010 Wifi.
 
-#include <ArduinoLMI.h>
+#include "ArduinoLMI.h"
 
 #define MATRIXA -1874.3,-0.0264,0.0,  3960.0,-1.0,0.0,  0.0,-1.0,0.0 // problem-specific constant (A matrix)
 #define MATRIXA1 -100.0,0.0,0.0, 0.0,0.0,0.0,  0.0,0.0,0.0 // problem-specific constant (A matrix)
@@ -104,7 +104,12 @@ void loop() {
   /// robust regional pole placement example
   //MatrixXf A1(MATRIXN,MATRIXN); // problem-specific definition
   //A1 << MATRIXA1;
-  //Eigen::MatrixXf Kr= RegionalPolePlacementRobust1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA,1,0);  
+  //timer=millis();
+  //Eigen::MatrixXf Kr= RegionalPolePlacementRobust1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA, 1,0);  
+  //timer=millis()-timer;
+  //Serial.print("Elapsed time (ms): " );
+  //Serial.println(timer);   
+  //Serial.println();
   //Serial.println("A+B*K");
   //print_mtxf(A+B*Kr);      // p=0
   //print_mtxf(A+A1+B*Kr);   // p=1
@@ -112,7 +117,12 @@ void loop() {
   /// gain scheduling regional pole placement example
   //MatrixXf A1(MATRIXN,MATRIXN); // problem-specific definition
   //A1 << MATRIXA1;
+  //timer=millis();
   //Eigen::MatrixXf** Kp= RegionalPolePlacementGainScheduling1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA,1,0);  
+  //timer=millis()-timer;
+  //Serial.print("Elapsed time (ms): " );
+  //Serial.println(timer);   
+  //Serial.println();
   //Serial.println("A+B*K");
   //print_mtxf(A+B*(*Kp[0]));            // p=0
   //print_mtxf(A+A1+B*(*Kp[1]+*Kp[0]));  // p=1
