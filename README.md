@@ -31,7 +31,7 @@ Eigen::MatrixXf DecayRate(Eigen::MatrixXf A, Eigen::MatrixXf B, float amin)
 Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A+BK$
 is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraint:
-<br> $ \Re(\lambda) \leqslant -\texttt{amin}$. 
+<br> $\Re(\lambda) \leqslant -\texttt{amin}$. 
 <br>
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$.
 
@@ -54,8 +54,8 @@ Eigen::MatrixXf DeacayRate1Param(Eigen::MatrixXf A0, Eigen::MatrixXf A1, Eigen::
 ```
 Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A_0+p_1 A_1+ BK$
-is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
-<br> $ \Re(\lambda) \leqslant -\texttt{amin}$, 
+is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraint:
+<br> $\Re(\lambda) \leqslant -\texttt{amin}$, 
 <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the interval).
