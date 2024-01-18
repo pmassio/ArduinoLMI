@@ -80,7 +80,7 @@ Eigen::MatrixXf** DecayRateGainScheduling1Param(Eigen::MatrixXf A0,  Eigen::Matr
 ```
 Returns a pointer to a two-dimensional array of MatriXf pointers object containing a matrix $K$ of gains, such that the matrix 
 $A_0+p_1 A_1+ B(\texttt{*K[0]}+p_1\texttt{*K[1]})$
-is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraints:
+is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraint:
 <br> $\Re(\lambda) \leqslant -\texttt{amin}$, <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the interval). Remember to delete  \texttt{Kp[0]}
