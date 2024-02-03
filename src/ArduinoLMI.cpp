@@ -19,7 +19,7 @@ using namespace Eigen;    // Eigen related statement; simplifies syntax for decl
 
 #define TOLERANCE 0.001 // solver tolerance (>0)
 #define FEASTOL 0.1// solver tolerance for feasibility (>0)
-#define TFACTOR 10 // solver convergence parameter (>0)
+#define TFACTOR 10 // solver convergence parameter (>1)
 #define NESTEROV 1 // uses Nesterov's step 1=yes/0=no
 
 void LMISolver(Eigen::MatrixXf *F[], Eigen::MatrixXf *V[], Eigen::VectorXf& x, int sizeunk, int *sizecon, int NUNK, int NCON) {
