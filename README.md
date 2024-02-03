@@ -31,7 +31,7 @@ Please see the example.ino for an example of application code.
 
 ### Nominal decay rate stabilisation
 ```cpp
-Eigen::MatrixXf DecayRate(Eigen::MatrixXf A, Eigen::MatrixXf B, float amin)  
+Eigen::MatrixXf DecayRate(Eigen::MatrixXf& A, Eigen::MatrixXf& B, float amin)  
 ```
 Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A+BK$
@@ -43,7 +43,7 @@ This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$.
 
 ### Nominal regional pole placement
 ```cpp
-Eigen::MatrixXf RegionalPolePlacement(Eigen::MatrixXf A, Eigen::MatrixXf B, float amax, float amin, float beta)  
+Eigen::MatrixXf RegionalPolePlacement(Eigen::MatrixXf& A, Eigen::MatrixXf& B, float amax, float amin, float beta)  
 ```
 Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A+BK$
@@ -55,7 +55,7 @@ This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$,
 
 ### Robust decay rate stabilisation (with 1 parameter)
 ```cpp
-Eigen::MatrixXf DeacayRate1Param(Eigen::MatrixXf A0, Eigen::MatrixXf A1, Eigen::MatrixXf B, float amin,  float p1max, float p1min);    
+Eigen::MatrixXf DeacayRate1Param(Eigen::MatrixXf& A0, Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amin,  float p1max, float p1min);    
 ```
 Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A_0+p_1 A_1+ BK$
@@ -67,7 +67,7 @@ This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$.
 
 ### Robust regional pole placement (with 1 parameter)
 ```cpp
-Eigen::MatrixXf RegionalPolePlacementRobust1Param(Eigen::MatrixXf A0, Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float p1max, float p1min);    
+Eigen::MatrixXf RegionalPolePlacementRobust1Param(Eigen::MatrixXf& A0, Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amax, float amin, float beta, float p1max, float p1min);    
 ```
 Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
 $A_0+p_1 A_1+ BK$
@@ -78,10 +78,22 @@ is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constr
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate. These properties are kept for any arbitrarily fast change of the value of the parameter (within the interval).
 
+### Robust decay rate stabilisation under norm-constrained bound
+```cpp
+Eigen::MatrixXf DecayRateRobustNormBound(Eigen::MatrixXf& A0, Eigen::MatrixXf& B, Eigen::MatrixXf& E, Eigen::MatrixXf& F, float amin);  
+```
+Returns a MatriXf object containing a matrix $K$ of gains, such that the matrix 
+$A_0+E \Delta F+ BK$
+is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraint:
+<br> $\Re(\lambda) \leqslant -\texttt{amin}$, 
+<br>
+for all values of the $d \times d$ matrix parameter $\Delta$ with maximum singular value smaller or equal to 1.
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the norm constraint). Notice that $E \in \matbb{R}^{n \times dn}$ and $F \in \matbb{R}^{d \times n}$ (with $A \in \matbb{R}^{n \times n}$); make sure that these parameters are entered correctly because there is no internal check on their dimensions or consistency.
+  
 
 ### Gain-scheduled decay rate stabilisation (with 1 parameter)
 ```cpp
-Eigen::MatrixXf** DecayRateGainScheduling1Param(Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amin, float pmax, float pmin);
+Eigen::MatrixXf** DecayRateGainScheduling1Param(Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amin, float pmax, float pmin);
 ```
 Returns a pointer to a two-dimensional array of MatriXf pointers object containing a matrix $K$ of gains, such that the matrix 
 $A_0+p_1 A_1+ B(\texttt{*K[0]}+p_1\texttt{*K[1]})$
@@ -94,7 +106,7 @@ This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$.
 
 ### Gain-scheduled regional pole placement (with 1 parameter)
 ```cpp
-Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param(Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float pmax, float pmin);
+Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param(Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amax, float amin, float beta, float pmax, float pmin);
 ```
 Returns a pointer to a two-dimensional array of MatriXf pointers object containing a matrix $K$ of gains, such that the matrix 
 $A_0+p_1 A_1+ B(\texttt{*K[0]}+p_1\texttt{*K[1]})$
@@ -105,6 +117,9 @@ is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constr
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
 This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate. These properties are kept for any arbitrarily fast change of the value of the parameter (within the interval). Remember to delete  \texttt{Kp[0]}
   and \texttt{Kp[1]} to free the memory before launching this function for a second time.
+
+
+
 
 # Licence 
 GNU General Public License 3.0
