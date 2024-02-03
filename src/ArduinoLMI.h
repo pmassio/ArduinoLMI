@@ -17,13 +17,15 @@
 
 using namespace Eigen;    // Eigen related statement; simplifies syntax for declaration of matrices
 
-void LMISolver(MatrixXf *F[], MatrixXf *V[], VectorXf& x, int sizeunk, int *sizecon, int NUNK, int NCON);
-Eigen::MatrixXf RegionalPolePlacement(Eigen::MatrixXf A, Eigen::MatrixXf B, float amax, float amin, float beta);  
-Eigen::MatrixXf RegionalPolePlacementRobust1Param(Eigen::MatrixXf A0, Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float p1max, float p1min);  
-Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param(Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float pmax, float pmin);
-Eigen::MatrixXf DecayRate( Eigen::MatrixXf A,  Eigen::MatrixXf B, float amin);
-Eigen::MatrixXf DecayRateRobust1Param(Eigen::MatrixXf A0, Eigen::MatrixXf A1, Eigen::MatrixXf B, float amin,float p1max, float p1min);  
-Eigen::MatrixXf** DecayRateGainScheduling1Param(Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amin, float pmax, float pmin);
+void LMISolver(Eigen::MatrixXf *F[], Eigen::MatrixXf *V[], Eigen::VectorXf& x, int sizeunk, int *sizecon, int NUNK, int NCON);
+Eigen::MatrixXf RegionalPolePlacement(Eigen::MatrixXf& A, Eigen::MatrixXf& B, float amax, float amin, float beta);  
+Eigen::MatrixXf RegionalPolePlacementRobust1Param(Eigen::MatrixXf& A0, Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amax, float amin, float beta, float p1max, float p1min);  
+Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param(Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amax, float amin, float beta, float pmax, float pmin);
+Eigen::MatrixXf DecayRate(Eigen::MatrixXf& A, Eigen::MatrixXf& B, float amin);
+Eigen::MatrixXf DecayRateRobust1Param(Eigen::MatrixXf& A0, Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amin,float p1max, float p1min);  
+Eigen::MatrixXf** DecayRateGainScheduling1Param(Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amin, float pmax, float pmin);
+Eigen::MatrixXf DecayRateRobustNormBound(Eigen::MatrixXf& A0, Eigen::MatrixXf& B, Eigen::MatrixXf& E, Eigen::MatrixXf& F, float amin);  
+
 
 
 

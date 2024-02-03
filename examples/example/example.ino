@@ -43,11 +43,14 @@
 // supported by all Arduino boards. This code has been tested to work on Arduino 
 // MKR1000 and Arduino MKR1010 Wifi.
 
-#include <ArduinoLMI.h>
+#include "ArduinoLMI.h"
 
 #define MATRIXA -1874.3,-0.0264,0.0,  3960.0,-1.0,0.0,  0.0,-1.0,0.0 // problem-specific constant (A matrix)
 #define MATRIXA1 -100.0,0.0,0.0, 0.0,0.0,0.0,  0.0,0.0,0.0 // problem-specific constant (A matrix)
+#define MATRIXE 10,0,0 // problem-specific constant (E matrix)
+#define MATRIXF 5,0,0 // problem-specific constant (F matrix)
 #define MATRIXB 2857.1,0.0,0.0 // problem-specific constant (B matrix)
+#define MATRIXD 1 // problem-specific constant (F matrix)
 #define MATRIXN 3  // problem-specific constant (number of state variables)
 #define MATRIXM 1  // problem-specific constant (number of input variables)
 #define ALPHAMAX 1200.0 // problem-specific constant
@@ -68,6 +71,7 @@ void setup() {
 
 void loop() {
   long timer;
+  Serial.println();
   Serial.println("Send a key through serial com in order to start the computation.");
   Serial.println();
 
@@ -85,8 +89,9 @@ void loop() {
   MatrixXf B(MATRIXN,MATRIXM); // problem-specific definition 
   A << MATRIXA;
   B << MATRIXB;
-  
-  /// nominal regional pole placement example
+
+  Serial.println();
+  Serial.println("Nominal regional pole placement example");
   timer=millis();
   Eigen::MatrixXf K= RegionalPolePlacement(A, B, ALPHAMAX, ALPHAMIN, BETA);  
   timer=millis()-timer;
@@ -99,35 +104,40 @@ void loop() {
   print_mtxf(A+B*K);          
   Serial.println("Copy and paste this matrix into your favourite computational software to verify that for");
   Serial.println("each eigenvalue lambda, -ALPHAMAX < Re(lambda) < -ALPHAMIN, |Im(lambda)| < BETA |Re(lambda)|");
-  Serial.println();
-
-  /// robust regional pole placement example
-  //MatrixXf A1(MATRIXN,MATRIXN); // problem-specific definition
-  //A1 << MATRIXA1;
-  //timer=millis();
-  //Eigen::MatrixXf Kr= RegionalPolePlacementRobust1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA, 1,0);  
-  //timer=millis()-timer;
-  //Serial.print("Elapsed time (ms): " );
-  //Serial.println(timer);   
-  //Serial.println();
-  //Serial.println("A+B*K");
-  //print_mtxf(A+B*Kr);      // p=0
-  //print_mtxf(A+A1+B*Kr);   // p=1
   
-  /// gain scheduling regional pole placement example
-  //MatrixXf A1(MATRIXN,MATRIXN); // problem-specific definition
-  //A1 << MATRIXA1;
-  //timer=millis();
-  //Eigen::MatrixXf** Kp= RegionalPolePlacementGainScheduling1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA,1,0);  
-  //timer=millis()-timer;
-  //Serial.print("Elapsed time (ms): " );
-  //Serial.println(timer);   
-  //Serial.println();
-  //Serial.println("A+B*K");
-  //print_mtxf(A+B*(*Kp[0]));            // p=0
-  //print_mtxf(A+A1+B*(*Kp[1]+*Kp[0]));  // p=1
-  //delete Kp[1];
-  //delete Kp[0];
+
+  Serial.println();
+  Serial.println("Robust regional pole placement example");
+  MatrixXf A1(MATRIXN,MATRIXN); // problem-specific definition
+  A1 << MATRIXA1;
+  timer=millis();
+  Eigen::MatrixXf Kr= RegionalPolePlacementRobust1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA, 1,0);  
+  timer=millis()-timer;
+  Serial.print("Elapsed time (ms): " );
+  Serial.println(timer);   
+  Serial.println();
+  Serial.println("A+B*K");
+  print_mtxf(A+B*Kr);      // p=0
+  print_mtxf(A+A1+B*Kr);   // p=1
+  Serial.println("Copy and paste these matrices into your favourite computational software to verify that for");
+  Serial.println("each eigenvalue lambda, -ALPHAMAX < Re(lambda) < -ALPHAMIN, |Im(lambda)| < BETA |Re(lambda)|");
+  
+  Serial.println();
+  Serial.println("Gain scheduling regional pole placement example");
+  timer=millis();
+  Eigen::MatrixXf** Kp= RegionalPolePlacementGainScheduling1Param(A, A1, B, ALPHAMAX, ALPHAMIN, BETA,1,0);  
+  timer=millis()-timer;
+  Serial.print("Elapsed time (ms): " );
+  Serial.println(timer);   
+  Serial.println();
+  Serial.println("A+B*K");
+  print_mtxf(A+B*(*Kp[0]));            // p=0
+  print_mtxf(A+A1+B*(*Kp[1]+*Kp[0]));  // p=1
+  delete Kp[1];
+  delete Kp[0];
+  Serial.println("Copy and paste these matrices into your favourite computational software to verify that for");
+  Serial.println("each eigenvalue lambda, -ALPHAMAX < Re(lambda) < -ALPHAMIN, |Im(lambda)| < BETA |Re(lambda)|");
+
 }
 
 

@@ -19,18 +19,18 @@ using namespace Eigen;    // Eigen related statement; simplifies syntax for decl
 
 #define TOLERANCE 0.001 // solver tolerance (>0)
 #define FEASTOL 0.1// solver tolerance for feasibility (>0)
-#define THETA 0.05 // solver convergence parameter (>0)
+#define TFACTOR 10 // solver convergence parameter (>0)
+#define NESTEROV 1 // uses Nesterov's step 1=yes/0=no
 
-
-void LMISolver(MatrixXf *F[], MatrixXf *V[], VectorXf& x, int sizeunk, int *sizecon, int NUNK, int NCON) {
+void LMISolver(Eigen::MatrixXf *F[], Eigen::MatrixXf *V[], Eigen::VectorXf& x, int sizeunk, int *sizecon, int NUNK, int NCON) {
   MatrixXf* FF[NCON];
   VectorXf grad(sizeunk);
   MatrixXf hess(sizeunk,sizeunk);
 
-
   int it=0;
   int itin=0;
-  float l0=(1.0+THETA)*x(0);
+  float t=1;
+ // float l0=(1.0+THETA)*x(0);
 
   for (int i=0;i<NCON;i++) {
     FF[i]=new MatrixXf(sizecon[i],sizecon[i]);
@@ -59,7 +59,8 @@ void LMISolver(MatrixXf *F[], MatrixXf *V[], VectorXf& x, int sizeunk, int *size
                 grad(u)=grad(u)-(V[c*(sizeunk+1)+u]->trace());
         } 
       }
-      grad(0)+= 1.0/(l0-x(0));
+      //grad(0)+= 1.0/(l0-x(0));
+      grad(0)+= t;
 
       for (int u1=0; u1<sizeunk; u1++) {
         for (int u2=u1; u2<sizeunk; u2++) {
@@ -72,35 +73,62 @@ void LMISolver(MatrixXf *F[], MatrixXf *V[], VectorXf& x, int sizeunk, int *size
           }
         }
       }
-      hess(0,0)+= 1.0/sq(l0-x(0));
+ //     hess(0,0)+= 1.0/sq(l0-x(0));
+ 
  //    Serial.print("hessian: ");  
  //       print_mtxf(hess);
-      x+= -hess.llt().solve(grad);
+
+      if (NESTEROV){
+        VectorXf Delta(sizeunk);
+        float delta;
+        Delta = hess.llt().solve(grad);
+        delta =  Delta.dot(grad);
+        
+        if (delta<= 0.0625) {
+         x+=-Delta;
+        }
+        else
+        {
+          x+=-Delta/(1.0+sqrt(delta));
+        }
+      }
+      else  //no Nesterov step
+      {
+        x+= -hess.llt().solve(grad);
+      }
+
       //Serial.print("x0: ");
-      //Serial.print(x(0));
+      //Serial.println(x(0));
       VectorXf delta1=x-x00;
       //Serial.print(" delta1: ");      
       //Serial.println(      delta1.squaredNorm());
-      if ((delta1.squaredNorm()<TOLERANCE*TOLERANCE )|| (x(0)<-FEASTOL)|| (itin>=200)){
+      if ((delta1.squaredNorm()<TOLERANCE*TOLERANCE )|| (x(0)<-FEASTOL)|| (itin>=2000)){
         bailout1=1;
       }
     }
     VectorXf delta0=x-x0;
+
+    //Serial.print("x: ");      
+    //Serial.println( sqrt(x.squaredNorm()));
+    //Serial.print("x0: ");      
+    //Serial.println( sqrt(x0.squaredNorm()));
     //Serial.print(" delta2: ");      
-    //Serial.println(      delta0.squaredNorm());
-    if ((delta0.squaredNorm()<TOLERANCE*TOLERANCE )|| (x(0)<-FEASTOL)|| (itin>=200)){
+    //Serial.println(      sqrt(delta0.squaredNorm()));
+    if ((delta0.squaredNorm()<TOLERANCE*TOLERANCE )|| (x(0)<-FEASTOL)|| (itin>=2000)){
       bailout0=1;      
     } else {
-      l0=THETA*(x0(0))+(1-THETA)*x(0);
+      t=TFACTOR*t;
+  //    l0=THETA*(x0(0))+(1-THETA)*x(0);
     }   
   }
+
   for (int c=0;c<NCON; c++){     
     delete FF[c];    
   }
   return;
 }
 
-Eigen::MatrixXf RegionalPolePlacement( Eigen::MatrixXf A,  Eigen::MatrixXf B, float amax, float amin, float beta)  {
+Eigen::MatrixXf RegionalPolePlacement( Eigen::MatrixXf& A,  Eigen::MatrixXf& B, float amax, float amin, float beta)  {
   int NUNK=2;
   int NCON=4;
   MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
@@ -115,8 +143,6 @@ Eigen::MatrixXf RegionalPolePlacement( Eigen::MatrixXf A,  Eigen::MatrixXf B, fl
 
   MATRIXN=A.cols();
   MATRIXM=B.cols();
-
-  int sizecon[NCON]={MATRIXN,MATRIXN,2*MATRIXN,MATRIXN}; // size of linear matrix inequality constraints
 
   unk[0]=new MatrixXf(MATRIXN,MATRIXN);
   unk[1]=new MatrixXf(MATRIXM,MATRIXN);
@@ -137,6 +163,8 @@ Eigen::MatrixXf RegionalPolePlacement( Eigen::MatrixXf A,  Eigen::MatrixXf B, fl
     sizeunk=start[NUNK-1]+unk[NUNK-1]->cols()*unk[NUNK-1]->rows();
   }   
   
+  int sizecon[NCON]={MATRIXN,MATRIXN,2*MATRIXN,MATRIXN}; // size of linear matrix inequality constraints
+
   unkpoint1 = new float*[sizeunk];  
   unkpoint2 = new float*[sizeunk];  
   counter=1;
@@ -201,7 +229,14 @@ Eigen::MatrixXf RegionalPolePlacement( Eigen::MatrixXf A,  Eigen::MatrixXf B, fl
     V[2*(sizeunk+1)+i]->block(MATRIXN,MATRIXN,MATRIXN,MATRIXN)= -beta*(X*A.transpose()+A*X+Y.transpose()*B.transpose()+B*Y); //
     V[2*(sizeunk+1)+i]->block(MATRIXN,0,MATRIXN,MATRIXN)=A*X-X*A.transpose()+B*Y-Y.transpose()*B.transpose(); //
     V[3*(sizeunk+1)+i]->noalias()=B*Y+Y.transpose()*B.transpose()+2*amax*X+X*A.transpose()+A*X; //
-    
+    //V[4*(sizeunk+1)+i]->setIdentity();
+    //(*V[4*(sizeunk+1)+i])=1000000.0*(*V[4*(sizeunk+1)+i]);
+    //(*V[4*(sizeunk+1)+i])(sizeunk,sizeunk)=0.00000001;
+    //if (i<sizeunk){
+    //  (*V[4*(sizeunk+1)+i])(0,i)=1.0; //
+    //  (*V[4*(sizeunk+1)+i])(i,0)=1.0;
+    //}
+
     /////////////////////////////// END WRITE LMIS HERE ///////////////////////////////    
     
     
@@ -256,7 +291,7 @@ Eigen::MatrixXf RegionalPolePlacement( Eigen::MatrixXf A,  Eigen::MatrixXf B, fl
   return K;
 }
 
-Eigen::MatrixXf RegionalPolePlacementRobust1Param( Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float pmax, float pmin)  {
+Eigen::MatrixXf RegionalPolePlacementRobust1Param( Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amax, float amin, float beta, float pmax, float pmin)  {
   int NUNK=2;
   int NCON=7;
   MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
@@ -423,7 +458,7 @@ Eigen::MatrixXf RegionalPolePlacementRobust1Param( Eigen::MatrixXf A0,  Eigen::M
 
 
 
-Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param( Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amax, float amin, float beta, float pmax, float pmin)  {
+Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param( Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amax, float amin, float beta, float pmax, float pmin)  {
   int NUNK=3;
   int NCON=7;
   MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
@@ -599,7 +634,7 @@ Eigen::MatrixXf** RegionalPolePlacementGainScheduling1Param( Eigen::MatrixXf A0,
 }
 
 
-Eigen::MatrixXf DecayRate( Eigen::MatrixXf A,  Eigen::MatrixXf B, float amin)  {
+Eigen::MatrixXf DecayRate( Eigen::MatrixXf& A,  Eigen::MatrixXf& B, float amin)  {
   int NUNK=2;
   int NCON=2;
   MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
@@ -750,7 +785,7 @@ Eigen::MatrixXf DecayRate( Eigen::MatrixXf A,  Eigen::MatrixXf B, float amin)  {
   return K;
 }
 
-Eigen::MatrixXf DecayRateRobust1Param( Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amin, float pmax, float pmin)  {
+Eigen::MatrixXf DecayRateRobust1Param( Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amin, float pmax, float pmin)  {
   int NUNK=2;
   int NCON=3;
   MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
@@ -903,7 +938,7 @@ Eigen::MatrixXf DecayRateRobust1Param( Eigen::MatrixXf A0,  Eigen::MatrixXf A1, 
 }
 
 
-Eigen::MatrixXf** DecayRateGainScheduling1Param( Eigen::MatrixXf A0,  Eigen::MatrixXf A1, Eigen::MatrixXf B, float amin, float pmax, float pmin)  {
+Eigen::MatrixXf** DecayRateGainScheduling1Param( Eigen::MatrixXf& A0,  Eigen::MatrixXf& A1, Eigen::MatrixXf& B, float amin, float pmax, float pmin)  {
   int NUNK=3;
   int NCON=3;
   MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
@@ -1068,4 +1103,166 @@ Eigen::MatrixXf** DecayRateGainScheduling1Param( Eigen::MatrixXf A0,  Eigen::Mat
   return K;
 }
 
+Eigen::MatrixXf DecayRateRobustNormBound(Eigen::MatrixXf& A0, Eigen::MatrixXf& B, Eigen::MatrixXf& E, Eigen::MatrixXf& F, float amin)
+{
+int NUNK=3;
+  int NCON=3;
+  MatrixXf* unk[NUNK];  // vector of pointers to matrix unknowns 
+  float **unkpoint1, **unkpoint2;  // pointers to values of matrix unknowns (2 for symmetric matrices)
+  char sym[NUNK]={1,0,1};            // symmetric matrix indicator (1 yes, 0 no)
+  int start[NUNK];                 // start position of each matrix unknown (MAYBE NOT USED ANYMORE)
+  int sizeunk; // size of unknown vector (first unknown is lambda)
+  int counter;
+  int MATRIXN;
+  int MATRIXM;
+  int MATRIXD;
+  float lambda=0.0;
+
+  MATRIXN=A0.cols();
+  MATRIXM=B.cols();
+  MATRIXD=E.cols(); //E must be n x d, F must be d x n
+  Serial.println(MATRIXD);
+  int sizecon[NCON]={MATRIXN,MATRIXN+MATRIXD,1}; // size of linear matrix inequality constraints
+
+  unk[0]=new MatrixXf(MATRIXN,MATRIXN);
+  unk[1]=new MatrixXf(MATRIXM,MATRIXN);
+  unk[2]=new MatrixXf(1,1);
+  
+  start[0]=1; // first unknown is lambda
+  for(int i=1;i<NUNK;i++) {
+    if (sym[i-1]){
+      start[i]= start[i-1]+unk[i-1]->rows()*(unk[i-1]->rows()+1)/2;
+    }
+    else {
+      start[i]=start[i-1]+unk[i-1]->cols()*unk[i-1]->rows();
+    }
+  }
+  if (sym[NUNK-1]) {
+    sizeunk=start[NUNK-1]+unk[NUNK-1]->rows()*(unk[NUNK-1]->rows()+1)/2;
+  }
+  else {
+    sizeunk=start[NUNK-1]+unk[NUNK-1]->cols()*unk[NUNK-1]->rows();
+  }   
+  
+  unkpoint1 = new float*[sizeunk];  
+  unkpoint2 = new float*[sizeunk];  
+  counter=1;
+
+  for (int i=0; i<NUNK;i++) { 
+    for (int lin=0; lin<unk[i]->rows(); lin++ ){
+      if (sym[i]) {
+        for (int col=0; col<=lin; col++ ){
+           unkpoint1[counter]=&(unk[i]->coeffRef(lin,col));          
+           unkpoint2[counter]=&(unk[i]->coeffRef(col,lin));  
+           *(unkpoint1[counter])=0.0;
+           *(unkpoint2[counter])=0.0;
+           counter++;
+        }
+      } 
+      else {
+        for (int col=0; col<unk[i]->cols(); col++ ){
+          unkpoint1[counter]=&(unk[i]->coeffRef(lin,col));  
+          unkpoint2[counter]=&(unk[i]->coeffRef(lin,col));
+          *(unkpoint1[counter])=0.0; 
+          counter++;             
+        }
+      }
+    }
+  }
+
+  unkpoint1[0]=&lambda;
+  unkpoint2[0]=&lambda;
+
+  VectorXf x(sizeunk); // vector of all unknowns 
+  MatrixXf* F_[NCON*(sizeunk+1)];
+  MatrixXf* V[NCON*(sizeunk+1)];
+ 
+ 
+  x.setZero();
+  x(0)=1.0; //initialisation of lambda
+  
+  for(int i=sizeunk; i>=0;i--){
+
+    //i = sizeunk is the constant term F0
+    //i = 0 is lambda term
+    for (int j=0;j<NCON;j++) {
+
+      V[j*(sizeunk+1)+i]=new MatrixXf(sizecon[j],sizecon[j]);
+      F_[j*(sizeunk+1)+i]=new MatrixXf(sizecon[j],sizecon[j]);
+    }
+    
+    if (i<sizeunk){
+      *(unkpoint1[i])=1.0;
+      *(unkpoint2[i])=1.0;  
+    }
+    
+    ///////////////////////////////// WRITE LMIS HERE /////////////////////////////////    
+    MatrixXf X= *(unk[0]);   // this is suboptimal, can be skipped! just replace directly the unknowns
+    MatrixXf Y= *(unk[1]);    
+    MatrixXf mu=*(unk[2]);    
+    MatrixXf I(MATRIXN,MATRIXN);    
+    I.setIdentity();
+    MatrixXf Id(MATRIXD,MATRIXD);    
+    Id.setIdentity();
+    V[0*(sizeunk+1)+i]->noalias()=X-0.1*I;
+    V[1*(sizeunk+1)+i]->block(0,0,MATRIXN,MATRIXN)=-B*Y-Y.transpose()*B.transpose()-2*amin*X-X*A0.transpose()-A0*X-mu(0,0)*E*E.transpose();
+    V[1*(sizeunk+1)+i]->block(0,MATRIXN,MATRIXN,MATRIXD)=-X*F.transpose(); //
+    V[1*(sizeunk+1)+i]->block(MATRIXN,MATRIXN,MATRIXD,MATRIXD)= Id*mu(0,0); //
+    V[1*(sizeunk+1)+i]->block(MATRIXN,0,MATRIXD,MATRIXN)=-F*X; //
+    V[2*(sizeunk+1)+i]->noalias()=mu;
+    
+    
+    /////////////////////////////// END WRITE LMIS HERE ///////////////////////////////    
+    
+    
+
+    if (i<sizeunk){
+      *(unkpoint1[i])=0.0;
+      *(unkpoint2[i])=0.0;  
+      for (int j=0;j<NCON;j++) {
+        F_[j*(sizeunk+1)+i]->noalias()=*V[j*(sizeunk+1)+i]-*V[j*(sizeunk+1)+sizeunk];
+      }
+    } else {
+      for (int j=0;j<NCON;j++) {  // this is executed first and it initialises F
+        F_[j*(sizeunk+1)+i]->noalias()=*V[j*(sizeunk+1)+i];
+ //       es.compute(*F_[j][i], false);              /// These three lines of code force the compiler to include
+ //       if (-es.eigenvalues().minCoeff()>x(0)) {  /// eigenvalue computations in the sketch.  Remove to save
+  //        x(0)=-es.eigenvalues().minCoeff();      /// memory (but make sure initialisation of [0] is ok!)
+ //       }
+      }
+    }
+  }
+
+  for (int j=0;j<NCON;j++) {
+    F_[j*(sizeunk+1)+0]->setIdentity();
+  }
+
+  ////// solver starts here!!!!! //////
+  LMISolver(F_, V,  x,  sizeunk, sizecon,  NUNK,  NCON);
+
+  for (int i=1;i<sizeunk;i++){
+    *(unkpoint1[i])=x(i);
+    *(unkpoint2[i])=x(i);  
+  }
+  
+  MatrixXf K=(*unk[1])*(unk[0]->inverse());
+  
+  if (x(0)>=0) {// infeasible problem
+    K.setZero();
+  }
+
+  delete unkpoint1;
+  delete unkpoint2;
+  for (int i=0;i<NUNK; i++){
+    delete unk[i];
+  }
+
+  for (int i=0;i<sizeunk+1; i++){
+    for (int c=0;c<NCON; c++){
+      delete F_[c*(sizeunk+1)+i];    
+      delete V[c*(sizeunk+1)+i];  
+    }
+  }
+  return K;  
+}
 
