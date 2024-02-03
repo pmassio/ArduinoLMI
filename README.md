@@ -100,8 +100,8 @@ $A_0+p_1 A_1+ B(\texttt{*K[0]}+p_1\texttt{*K[1]})$
 is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constraint:
 <br> $\Re(\lambda) \leqslant -\texttt{amin}$, <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
-This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the interval). Remember to delete  \texttt{Kp[0]}
-  and \texttt{Kp[1]} to free the memory before launching this function for a second time.
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the interval). Remember to delete  $\texttt{Kp[0]}$
+  and $\texttt{Kp[1]}$ to free the memory before launching this function for a second time.
 
 
 ### Gain-scheduled regional pole placement (with 1 parameter)
@@ -115,8 +115,8 @@ is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constr
 <br> $|\Im(\lambda)|\leqslant \texttt{beta} |\Re(\lambda)|$,
 <br>
 for all values of the parameter $p_1$ in the interval $[\texttt{p1max}, \texttt{p1min}]$.
-This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate. These properties are kept for any arbitrarily fast change of the value of the parameter (within the interval). Remember to delete  \texttt{Kp[0]}
-  and \texttt{Kp[1]} to free the memory before launching this function for a second time.
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$, a maximum decay rate  $\texttt{amax}$, and a minimum damping rate. These properties are kept for any arbitrarily fast change of the value of the parameter (within the interval). Remember to delete  $\texttt{Kp[0]}$
+  and $\texttt{Kp[1]}$ to free the memory before launching this function for a second time.
 
 
 
