@@ -43,7 +43,7 @@
 // supported by all Arduino boards. This code has been tested to work on Arduino 
 // MKR1000 and Arduino MKR1010 Wifi.
 
-#include "ArduinoLMI.h"
+#include <ArduinoLMI.h>
 
 #define MATRIXA -1874.3,-0.0264,0.0,  3960.0,-1.0,0.0,  0.0,-1.0,0.0 // problem-specific constant (A matrix)
 #define MATRIXA1 -100.0,0.0,0.0, 0.0,0.0,0.0,  0.0,0.0,0.0 // problem-specific constant (A matrix)
