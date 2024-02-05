@@ -88,7 +88,7 @@ is Hurwitz and has all the eigenvalues $\lambda$ fulfilling the following constr
 <br> $\Re(\lambda) \leqslant -\texttt{amin}$, 
 <br>
 for all values of the $d \times d$ matrix parameter $\Delta$ with maximum singular value smaller or equal to 1.
-This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the norm constraint). Notice that $E \in \mathbb{R}^{n \times dn}$ and $F \in \mathbb{R}^{d \times n}$ (with $A \in \mathbb{R}^{n \times n}$); make sure that these parameters are entered correctly because there is no internal check on their dimensions or consistency.
+This is equivalent to imposing a minimum (positive) decay rate  $\texttt{amin}$. This property is kept for any arbitrarily fast change of the value of the parameter (within the norm constraint). Notice that $E \in \mathbb{R}^{n \times d}$ and $F \in \mathbb{R}^{d \times n}$ (with $A \in \mathbb{R}^{n \times n}$); make sure that these parameters are entered correctly because there is no internal check on their dimensions or consistency.
   
 
 ### Gain-scheduled decay rate stabilisation (with 1 parameter)
