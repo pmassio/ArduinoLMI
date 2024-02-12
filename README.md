@@ -16,7 +16,7 @@ For the regional pole placement method, refer to
  pp. 2257-2270, Dec. 1999*](https://doi.org/10.1109/9.811208).
 
 ## Requirements
-Requires [ArduinoEigen](https://github.com/hideakitai/ArduinoEigen), so it will work only on architectures supporting c++ standard libraries (STM and SAM). It might work on other architectures if you manage to install such libraries somehow, with a bit more effort. 
+Requires [ArduinoEigen](https://github.com/hideakitai/ArduinoEigen), so it will work only on architectures supporting c++ standard libraries (MBED_GIGA and SAMD). It might work on other architectures if you manage to install such libraries somehow, with a bit more effort. 
 
 ## Usage
 The library provides an embedded implementation of controller synthesis problems requiring the solution of a Linear Matrix Inequality (LMI) feasibility problem. In general this can be made on a laptop computer, and the resulting gain can be just copied on the embedded controller; this library is aimed at applications where the controller needs to be recomputed on board, such as adaptive control, autonomous systems, etc. Please take into account that the solver will take a significant time to deliver a solution; I have tested it on an MKR1010 and on a GIGA R1; for the first one expect a few seconds or few tens of seconds for systems up to order four, whereas for the GIGA R1 it runs a lot faster. 
