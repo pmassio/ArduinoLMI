@@ -21,7 +21,7 @@ Requires [ArduinoEigen](https://github.com/hideakitai/ArduinoEigen), so it will 
 ## Usage
 The library provides an embedded implementation of controller synthesis problems requiring the solution of a Linear Matrix Inequality (LMI) feasibility problem. In general this can be made on a laptop computer, and the resulting gain can be just copied on the embedded controller; this library is aimed at applications where the controller needs to be recomputed on board, such as adaptive control, autonomous systems, etc. Please take into account that the solver will take a significant time to deliver a solution; I have tested it on an MKR1010 and on a GIGA R1; for the first one expect a few seconds or few tens of seconds for systems up to order four, whereas for the GIGA R1 it runs a lot faster. 
 
-Do not use this code for high-order system.
+Do not use this code for high-order systems.
 
 The functions return $0$ matrices if the problem is unfeasible. There are no checks on the input matrices size, make sure the $A$ matrices are square, and that the $B$ matrices have as many rows as the $A$ matrices.
 
